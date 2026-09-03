@@ -1,0 +1,35 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { logout } from "@/lib/api";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Button } from "@/components/ui/button";
+
+export function DashboardHeader() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    toast.success("Signed out");
+    router.push("/login");
+    router.refresh();
+  };
+
+  return (
+    <div className="flex items-center justify-between rounded-[1.75rem] border border-border/60 bg-card/70 p-4">
+      <div>
+        <div className="text-sm text-muted-foreground">React Application</div>
+        <div className="text-lg font-semibold">Dashboard</div>
+      </div>
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <Button variant="outline">New item</Button>
+        <Button variant="ghost" onClick={handleLogout}>
+          Sign out
+        </Button>
+      </div>
+    </div>
+  );
+}
