@@ -9,10 +9,10 @@ import { env } from "@/lib/env";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 mb-8">
-      <div className="rounded-full border border-border/70 bg-background/80 px-4 py-3 shadow-sm backdrop-blur">
+      <div className="rounded-lg border border-border bg-background/90 px-4 py-3 shadow-sm backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+            <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <Braces className="size-5" />
             </div>
             <div>

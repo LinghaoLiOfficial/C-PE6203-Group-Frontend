@@ -24,8 +24,8 @@ type SavedGenerationPanelProps = {
 export function SavedGenerationPanel({
   buttonLabel,
   loadingLabel,
-  description = "后端正在调用大模型并保存结果，生成可能需要一些时间。",
-  successLabel = "已生成并保存。",
+  description = "The backend is calling the model and saving the result. Generation may take a moment.",
+  successLabel = "Generated and saved.",
   disabled = false,
   size = "default",
   variant = "default",
@@ -52,7 +52,7 @@ export function SavedGenerationPanel({
           ? formatError(err)
           : err instanceof Error
             ? err.message
-            : "生成失败，请稍后重试。"
+            : "Generation failed. Please try again later."
       );
     } finally {
       setRunning(false);

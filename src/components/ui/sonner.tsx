@@ -15,7 +15,7 @@ export function Sonner() {
       position="top-right"
       toastOptions={{
         classNames: {
-          toast: "!rounded-2xl",
+          toast: "!rounded-lg",
         },
       }}
     />

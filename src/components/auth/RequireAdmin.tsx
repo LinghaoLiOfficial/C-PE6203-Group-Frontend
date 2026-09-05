@@ -22,22 +22,22 @@ export function RequireAdmin({ children }: { children: React.ReactNode }) {
   }, [authenticated, loading, router]);
 
   if (loading || !authenticated) {
-    return <FullScreenLoadingState label="加载中..." />;
+    return <FullScreenLoadingState label="Loading..." />;
   }
 
   if (!isAdmin) {
     return (
       <div className="mx-auto flex min-h-screen w-full max-w-3xl items-center px-6 py-10">
-        <Alert variant="destructive">
+        <Alert>
           <div className="flex gap-3">
-            <ShieldAlert className="mt-1 size-5 shrink-0" />
+            <ShieldAlert className="mt-1 size-5 shrink-0 text-amber-400" />
             <div className="space-y-4">
               <div>
-                <AlertTitle>没有权限访问</AlertTitle>
-                <AlertDescription>管理员页面仅 admin 角色可访问。</AlertDescription>
+                <AlertTitle>Access denied</AlertTitle>
+                <AlertDescription>The admin page is only available to users with the admin role.</AlertDescription>
               </div>
               <Button asChild variant="outline" size="sm">
-                <Link href="/dashboard">Return to dashboard</Link>
+                <Link href="/dashboard">Back to dashboard</Link>
               </Button>
             </div>
           </div>

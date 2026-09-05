@@ -34,11 +34,11 @@ function getEventMessage(event: StreamEvent) {
   }
 
   if (event.type === "raw_complete") {
-    return `原始内容接收完成，共 ${event.text_length} 字符。`;
+    return `Raw content received, ${event.text_length} characters total.`;
   }
 
   if (event.type === "saved") {
-    return "生成结果已保存。";
+    return "Generated result saved.";
   }
 
   return null;
@@ -47,7 +47,7 @@ function getEventMessage(event: StreamEvent) {
 export function StreamingGenerationPanel({
   buttonLabel,
   loadingLabel,
-  successLabel = "生成完成。",
+  successLabel = "Generation complete.",
   outputTitle,
   disabled = false,
   showOutput = true,
@@ -78,7 +78,7 @@ export function StreamingGenerationPanel({
       ? formatError(errorValue)
       : errorValue instanceof Error
         ? errorValue.message
-        : "生成失败，请稍后重试。";
+        : "Generation failed. Please try again later.";
     streamErrorRef.current = true;
     setError(message);
     appendMessage(message);
@@ -92,7 +92,7 @@ export function StreamingGenerationPanel({
 
     if (event.type === "error") {
       streamErrorRef.current = true;
-      const message = event.message ?? "生成失败，请稍后重试。";
+      const message = event.message ?? "Generation failed. Please try again later.";
       setError(message);
       appendMessage(message);
       return;
@@ -150,8 +150,8 @@ export function StreamingGenerationPanel({
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
-        setError("已取消生成。");
-        appendMessage("已取消生成。");
+        setError("Generation canceled.");
+        appendMessage("Generation canceled.");
       } else {
         showError(err);
       }
@@ -175,7 +175,7 @@ export function StreamingGenerationPanel({
         {running ? (
           <Button type="button" size={size} variant="outline" onClick={handleCancel}>
             <CircleStop className="size-4" />
-            取消生成
+            Cancel generation
           </Button>
         ) : null}
       </div>

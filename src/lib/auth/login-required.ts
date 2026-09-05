@@ -1,4 +1,4 @@
-export const LOGIN_REQUIRED_MESSAGE = "请先登录";
+export const LOGIN_REQUIRED_MESSAGE = "Please sign in first.";
 export const LOGIN_REQUIRED_PARAM = "loginRequired";
 
 const AUTH_ROUTE_PREFIXES = ["/login"];

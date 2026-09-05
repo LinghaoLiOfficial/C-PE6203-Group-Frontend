@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export function JsonViewer({
   data,
   title = "JSON",
-  copyLabel = "复制 JSON",
+  copyLabel = "Copy JSON",
 }: {
   data: unknown;
   title?: string;
@@ -21,7 +21,7 @@ export function JsonViewer({
         </div>
       </CardHeader>
       <CardContent>
-        <pre className="max-h-[560px] overflow-auto rounded-[1.5rem] border border-border/60 bg-muted/50 p-4 font-mono text-xs leading-6 text-foreground">
+        <pre className="max-h-[560px] overflow-auto rounded-lg border border-border bg-muted/50 p-4 font-mono text-xs leading-6 text-foreground">
           <code>{json}</code>
         </pre>
       </CardContent>

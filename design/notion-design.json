@@ -1,0 +1,19 @@
+{
+  "color": {
+    "Background": { "$type": "color", "$value": "#030712" },
+    "Background Glow": { "$type": "color", "$value": "#081023" },
+    "Surface Elevated": { "$type": "color", "$value": "rgba(10, 15, 31, 0.9)" },
+    "Surface Muted": { "$type": "color", "$value": "rgba(148, 163, 184, 0.12)" },
+    "Text Primary": { "$type": "color", "$value": "#edf3ff" },
+    "Text Secondary": { "$type": "color", "$value": "#90a0bf" },
+    "Border Subtle": { "$type": "color", "$value": "rgba(130, 154, 212, 0.18)" },
+    "Accent Blue": { "$type": "color", "$value": "#6ea8ff" },
+    "Accent Cyan": { "$type": "color", "$value": "#2ad0ff" },
+    "Accent Danger": { "$type": "color", "$value": "#ff667a" }
+  },
+  "radius": {
+    "Control": { "$type": "dimension", "$value": "10px" },
+    "Card": { "$type": "dimension", "$value": "16px" },
+    "Pill": { "$type": "dimension", "$value": "9999px" }
+  }
+}

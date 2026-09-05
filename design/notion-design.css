@@ -1,0 +1,16 @@
+@theme {
+  --color-background: #030712;
+  --color-background-glow: #081023;
+  --color-surface-elevated: rgba(10, 15, 31, 0.9);
+  --color-surface-muted: rgba(148, 163, 184, 0.12);
+  --color-text-primary: #edf3ff;
+  --color-text-secondary: #90a0bf;
+  --color-border-subtle: rgba(130, 154, 212, 0.18);
+  --color-accent-blue: #6ea8ff;
+  --color-accent-cyan: #2ad0ff;
+  --color-accent-danger: #ff667a;
+
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-pill: 9999px;
+}

@@ -38,7 +38,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <tr
       data-slot="table-row"
-      className={cn("border-b border-border transition-colors hover:bg-muted/40", className)}
+      className={cn("border-b border-border transition-colors hover:bg-muted/50", className)}
       {...props}
     />
   );
@@ -49,7 +49,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-11 px-4 text-left align-middle text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground",
+        "h-11 px-4 text-left align-middle text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground",
         className
       )}
       {...props}

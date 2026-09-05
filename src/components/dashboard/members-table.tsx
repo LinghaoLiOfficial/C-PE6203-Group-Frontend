@@ -12,14 +12,14 @@ import {
 export function MembersTable() {
   return (
     <div className="space-y-4">
-      <div className="rounded-[1.75rem] border border-border/60 bg-background/60 p-2">
+      <div className="rounded-lg border border-border bg-background p-2 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>成员</TableHead>
-              <TableHead>邮箱</TableHead>
-              <TableHead>角色</TableHead>
-              <TableHead>状态</TableHead>
+              <TableHead>Member</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -13,22 +13,16 @@ type RedirectByRoleProps = {
 
 export function RedirectByRole({ children, redirectTo }: RedirectByRoleProps) {
   const router = useRouter();
-  const { loading, user } = useAuth();
+  const { loading, authenticated } = useAuth();
 
   useEffect(() => {
-    if (loading || !user) {
-      return;
+    if (!loading && authenticated) {
+      router.replace(redirectTo ?? "/dashboard");
     }
+  }, [authenticated, loading, redirectTo, router]);
 
-    router.replace(redirectTo ?? "/dashboard");
-  }, [loading, redirectTo, router, user]);
-
-  if (loading) {
-    return <FullScreenLoadingState label="加载中..." />;
-  }
-
-  if (user) {
-    return <FullScreenLoadingState label="加载中..." />;
+  if (loading || authenticated) {
+    return <FullScreenLoadingState label="Loading..." />;
   }
 
   return children ?? null;

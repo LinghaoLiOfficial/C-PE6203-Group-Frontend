@@ -9,13 +9,13 @@ type CopyButtonProps = {
   label?: string;
 };
 
-export function CopyButton({ value, label = "复制 JSON" }: CopyButtonProps) {
+export function CopyButton({ value, label = "Copy JSON" }: CopyButtonProps) {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(value);
-      toast.success("已复制到剪贴板");
+      toast.success("Copied to clipboard");
     } catch {
-      toast.error("复制失败，请重试");
+      toast.error("Copy failed. Please try again.");
     }
   };
 

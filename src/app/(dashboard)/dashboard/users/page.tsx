@@ -9,14 +9,14 @@ export default function UsersPage() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-4">
         <div>
-          <CardTitle>团队成员</CardTitle>
+          <CardTitle>Team members</CardTitle>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">
-            这是企业后台常见的列表页基础形态，包含表格和分页占位。
+            This is a common admin list layout with table and pagination placeholders.
           </p>
         </div>
         <Button>
           <Plus className="size-4" />
-          添加成员
+          Add member
         </Button>
       </CardHeader>
       <CardContent>

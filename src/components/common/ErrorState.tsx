@@ -9,7 +9,7 @@ type ErrorStateProps = {
 };
 
 export function ErrorState({
-  title = "请求失败",
+  title = "Request failed",
   message,
   actionLabel,
   onAction,

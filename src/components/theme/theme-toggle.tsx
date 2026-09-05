@@ -21,7 +21,7 @@ export function ThemeToggle() {
     <Button
       variant="outline"
       size="icon"
-      aria-label="切换主题"
+      aria-label="Toggle theme"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       disabled={!mounted}
     >

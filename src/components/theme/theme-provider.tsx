@@ -32,7 +32,7 @@ export function ThemeProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [theme, setThemeState] = React.useState<Theme>("system");
+  const [theme, setThemeState] = React.useState<Theme>("dark");
   const [resolvedTheme, setResolvedTheme] = React.useState<ResolvedTheme>();
   const [mounted, setMounted] = React.useState(false);
 
@@ -47,7 +47,7 @@ export function ThemeProvider({
 
   React.useEffect(() => {
     const storedTheme = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const initialTheme = storedTheme ?? "system";
+    const initialTheme = storedTheme ?? "dark";
     const initialResolvedTheme = resolveTheme(initialTheme);
 
     // Theme preference is only available in the browser, so the initial sync happens after mount.

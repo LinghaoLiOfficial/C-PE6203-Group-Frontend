@@ -61,9 +61,9 @@ export function FieldHint({
       return null;
     }
 
-    return createPortal(
+      return createPortal(
       <div
-        className="pointer-events-none fixed z-50 w-max max-w-72 rounded-md border border-border/70 bg-popover px-3 py-2 text-xs leading-5 text-popover-foreground shadow-md"
+        className="pointer-events-none fixed z-50 w-max max-w-72 rounded-md border border-border bg-popover px-3 py-2 text-xs leading-5 text-popover-foreground shadow-lg"
         style={{
           left: position.left,
           top: position.top,

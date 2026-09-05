@@ -28,8 +28,8 @@ export function ConfirmDialog({
   open,
   title,
   description,
-  confirmText = "确认",
-  cancelText = "取消",
+  confirmText = "Confirm",
+  cancelText = "Cancel",
   loading = false,
   destructive = false,
   error,
@@ -51,7 +51,7 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         {error ? (
-          <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
             {error}
           </p>
         ) : null}
@@ -63,7 +63,7 @@ export function ConfirmDialog({
             disabled={loading}
             onClick={onConfirm}
           >
-            {loading ? "处理中..." : confirmText}
+            {loading ? "Processing..." : confirmText}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -4,10 +4,10 @@ export default function AccessPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>权限管理</CardTitle>
+        <CardTitle>Access control</CardTitle>
       </CardHeader>
       <CardContent className="text-sm leading-7 text-muted-foreground">
-        这里适合接入角色、菜单权限、操作权限与组织结构配置。
+        This is a good place for roles, menu permissions, action permissions, and org structure settings.
       </CardContent>
     </Card>
   );

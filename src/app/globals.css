@@ -1,46 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(0.985 0.004 95);
-  --foreground: oklch(0.18 0.02 255);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 255);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 255);
-  --primary: oklch(0.24 0.03 260);
-  --primary-foreground: oklch(0.98 0.01 95);
-  --secondary: oklch(0.93 0.012 85);
-  --secondary-foreground: oklch(0.24 0.03 260);
-  --muted: oklch(0.95 0.008 85);
-  --muted-foreground: oklch(0.48 0.02 255);
-  --accent: oklch(0.9 0.04 75);
-  --accent-foreground: oklch(0.24 0.03 260);
-  --destructive: oklch(0.62 0.21 25);
-  --border: oklch(0.88 0.01 90);
-  --input: oklch(0.88 0.01 90);
-  --ring: oklch(0.72 0.05 80);
-  --radius: 1rem;
+  --background: #050816;
+  --foreground: #e8eefc;
+  --card: rgba(11, 18, 38, 0.86);
+  --card-foreground: #e8eefc;
+  --popover: #0b1226;
+  --popover-foreground: #e8eefc;
+  --primary: #4f8cff;
+  --primary-foreground: #050816;
+  --secondary: rgba(96, 120, 196, 0.14);
+  --secondary-foreground: #d8e4ff;
+  --muted: rgba(148, 163, 184, 0.12);
+  --muted-foreground: #91a0c5;
+  --accent: rgba(79, 140, 255, 0.18);
+  --accent-foreground: #e8eefc;
+  --destructive: #ff6b7a;
+  --border: rgba(120, 145, 205, 0.18);
+  --input: rgba(120, 145, 205, 0.22);
+  --ring: #7cb0ff;
+  --radius: 0.5rem;
 }
 
 .dark {
-  --background: oklch(0.2 0.02 255);
-  --foreground: oklch(0.97 0.005 95);
-  --card: oklch(0.24 0.02 255);
-  --card-foreground: oklch(0.97 0.005 95);
-  --popover: oklch(0.24 0.02 255);
-  --popover-foreground: oklch(0.97 0.005 95);
-  --primary: oklch(0.9 0.04 75);
-  --primary-foreground: oklch(0.22 0.02 255);
-  --secondary: oklch(0.3 0.02 255);
-  --secondary-foreground: oklch(0.97 0.005 95);
-  --muted: oklch(0.28 0.02 255);
-  --muted-foreground: oklch(0.75 0.02 95);
-  --accent: oklch(0.34 0.03 80);
-  --accent-foreground: oklch(0.97 0.005 95);
-  --destructive: oklch(0.68 0.22 25);
-  --border: oklch(0.34 0.02 255);
-  --input: oklch(0.34 0.02 255);
-  --ring: oklch(0.72 0.05 80);
+  --background: #030712;
+  --foreground: #edf3ff;
+  --card: rgba(10, 15, 31, 0.9);
+  --card-foreground: #edf3ff;
+  --popover: #0b1020;
+  --popover-foreground: #edf3ff;
+  --primary: #6ea8ff;
+  --primary-foreground: #030712;
+  --secondary: rgba(110, 168, 255, 0.14);
+  --secondary-foreground: #edf3ff;
+  --muted: rgba(148, 163, 184, 0.12);
+  --muted-foreground: #90a0bf;
+  --accent: rgba(110, 168, 255, 0.18);
+  --accent-foreground: #edf3ff;
+  --destructive: #ff667a;
+  --border: rgba(130, 154, 212, 0.18);
+  --input: rgba(130, 154, 212, 0.22);
+  --ring: #8ebaff;
 }
 
 @theme inline {
@@ -62,11 +62,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 0.5rem);
-  --radius-md: calc(var(--radius) - 0.25rem);
+  --radius-sm: calc(var(--radius) - 0.375rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 0.25rem);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -77,29 +77,31 @@
 
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
   body {
     @apply bg-background text-foreground font-sans;
     background-image:
-      radial-gradient(circle at top, color-mix(in oklch, var(--accent) 45%, transparent) 0%, transparent 30%),
-      linear-gradient(180deg, color-mix(in oklch, white 60%, var(--background)) 0%, var(--background) 100%);
+      radial-gradient(circle at top, rgba(78, 134, 255, 0.16) 0%, rgba(78, 134, 255, 0) 34%),
+      radial-gradient(circle at 80% 10%, rgba(42, 208, 255, 0.08) 0%, rgba(42, 208, 255, 0) 24%),
+      linear-gradient(180deg, #081023 0%, var(--background) 22rem, var(--background) 100%);
     background-repeat: no-repeat;
-    background-size: 100% 100vh, 100% 100vh;
-    background-attachment: scroll;
-  }
-
-  .dark body {
-    background-image:
-      radial-gradient(circle at top, color-mix(in oklch, var(--accent) 18%, transparent) 0%, transparent 30%),
-      linear-gradient(180deg, color-mix(in oklch, black 18%, var(--background)) 0%, var(--background) 100%);
-    background-repeat: no-repeat;
-    background-size: 100% 100vh, 100% 100vh;
-    background-attachment: scroll;
+    background-size: 100% 100%;
   }
 
   ::selection {
-    background: color-mix(in oklch, var(--accent) 65%, white);
-    color: var(--foreground);
+    background: color-mix(in srgb, var(--primary) 70%, black);
+    color: white;
+  }
+
+  a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 72%, black);
+    color: white;
   }
 }

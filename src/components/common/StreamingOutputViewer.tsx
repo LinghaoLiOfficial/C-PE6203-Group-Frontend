@@ -22,13 +22,13 @@ export function StreamingOutputViewer({
   error,
   running,
   done,
-  title = "实时生成内容",
+  title = "Live generation output",
   className,
 }: StreamingOutputViewerProps) {
   const visibleMessages = messages.slice(-4);
 
   return (
-    <Card className={cn("overflow-hidden rounded-2xl", className)}>
+    <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="gap-3 pb-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -36,10 +36,10 @@ export function StreamingOutputViewer({
               <FileText className="size-4" />
               {title}
             </CardTitle>
-            <CardDescription>后端流式返回的大模型原始输出</CardDescription>
+            <CardDescription>Raw model output streamed from the backend</CardDescription>
           </div>
           <Badge variant={error ? "destructive" : done ? "default" : "outline"}>
-            {error ? "生成失败" : done ? "生成完成" : running ? "生成中" : "待生成"}
+            {error ? "Failed" : done ? "Complete" : running ? "Running" : "Pending"}
           </Badge>
         </div>
         {visibleMessages.length ? (
@@ -61,15 +61,14 @@ export function StreamingOutputViewer({
       </CardHeader>
       <CardContent>
         {error ? (
-          <div className="mb-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
           </div>
         ) : null}
-        <pre className="max-h-80 overflow-auto rounded-xl border border-border/60 bg-muted/40 p-4 text-sm leading-6 whitespace-pre-wrap">
-          {output || "生成开始后，这里会显示实时输出内容。"}
+        <pre className="max-h-80 overflow-auto rounded-lg border border-border bg-muted/40 p-4 text-sm leading-6 whitespace-pre-wrap">
+          {output || "Live output will appear here once generation starts."}
         </pre>
       </CardContent>
     </Card>
   );
 }
-

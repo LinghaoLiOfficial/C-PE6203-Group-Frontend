@@ -1,8 +1,9 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogIn } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { RedirectByRole } from "@/components/auth/RedirectByRole";
@@ -18,7 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { loginWithPassword } = useAuth();
   const [email, setEmail] = useState("demo@example.com");
-  const [password, setPassword] = useState("password");
+  const [password, setPassword] = useState("Password1!");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -37,7 +38,7 @@ export default function LoginPage() {
       await loginWithPassword({ email, password });
       router.replace("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Login failed.");
     } finally {
       setSubmitting(false);
     }
@@ -45,20 +46,24 @@ export default function LoginPage() {
 
   return (
     <RedirectByRole>
-      <main className="mx-auto flex min-h-screen w-full max-w-5xl items-center px-6 py-10">
-        <div className="grid w-full gap-6 lg:grid-cols-[1fr_0.9fr]">
-          <section className="flex flex-col justify-center space-y-4">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm text-muted-foreground">
-              <LogIn className="size-4" />
-              React Application
+      <main className="relative min-h-screen overflow-hidden bg-background px-6 py-10 text-foreground">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(110,168,255,0.14),transparent_30%),linear-gradient(180deg,rgba(5,8,22,0.98),rgba(3,7,18,1))]" />
+        <div className="relative mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-6xl gap-8 lg:grid-cols-[1fr_0.95fr] lg:items-center">
+          <section className="space-y-6">
+            <div className="space-y-4">
+              <h1 className="text-5xl font-semibold tracking-[-0.04em] md:text-6xl">Sign in</h1>
+              <p className="max-w-xl text-lg leading-8 text-slate-300">
+                Access jobs, resumes, applications, and notifications from one dashboard.
+              </p>
             </div>
-            <h1 className="text-4xl font-semibold tracking-tight">Sign in</h1>
-            <p className="max-w-xl text-muted-foreground">Use the built-in demo session to enter the dashboard.</p>
+            <Button asChild variant="outline" className="w-fit border-border/70 bg-background/40 text-foreground hover:bg-accent/20">
+              <Link href="/register">Create account</Link>
+            </Button>
           </section>
 
-          <Card>
+          <Card className="border-border/70 bg-card/85 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_80px_rgba(0,0,0,0.34)] backdrop-blur">
             <CardHeader>
-              <CardTitle>Login</CardTitle>
+              <CardTitle className="text-2xl">Login</CardTitle>
             </CardHeader>
             <CardContent>
               <form className="space-y-5" onSubmit={handleSubmit}>
@@ -75,8 +80,9 @@ export default function LoginPage() {
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
                 </div>
-                <Button type="submit" className="w-full" disabled={submitting}>
+                <Button type="submit" className="w-full bg-gradient-to-r from-primary to-cyan-400 text-primary-foreground hover:brightness-110" disabled={submitting}>
                   {submitting ? "Signing in..." : "Sign in"}
+                  {!submitting ? <ArrowRight className="size-4" /> : null}
                 </Button>
               </form>
             </CardContent>

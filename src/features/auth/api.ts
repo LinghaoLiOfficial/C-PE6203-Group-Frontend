@@ -1,31 +1,14 @@
-import { apiRequest, ApiError } from "@/lib/api/client";
-import type { LoginValues } from "@/features/auth/schema";
-
-type SignInResponse = {
-  message: string;
-  user: {
-    email: string;
-    name: string;
-    role: string;
-  };
-};
+import { login, register, sendVerificationCode } from "@/lib/api";
+import type { LoginValues, RegisterValues } from "@/features/auth/schema";
 
 export async function signIn(payload: LoginValues) {
-  try {
-    return await apiRequest<SignInResponse>("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw new Error(error.message);
-    }
-    throw error;
-  }
+  return login(payload.email, payload.password);
 }
 
-export async function signOut() {
-  return apiRequest<{ message: string }>("/api/auth/logout", {
-    method: "POST",
-  });
+export async function signUp(payload: RegisterValues) {
+  return register(payload);
+}
+
+export async function requestVerificationCode(email: string) {
+  return sendVerificationCode(email);
 }

@@ -33,11 +33,11 @@ function SheetOverlay({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
-    <DialogPrimitive.Overlay
-      data-slot="sheet-overlay"
-      className={cn("fixed inset-0 z-50 bg-black/45 backdrop-blur-sm", className)}
-      {...props}
-    />
+      <DialogPrimitive.Overlay
+        data-slot="sheet-overlay"
+        className={cn("fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md", className)}
+        {...props}
+      />
   );
 }
 
@@ -55,7 +55,7 @@ function SheetContent({
       <DialogPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 border-border bg-background p-6 shadow-xl",
+          "fixed z-50 flex flex-col gap-4 border-border/70 bg-popover/95 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_40px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl",
           side === "right" &&
             "inset-y-0 right-0 h-full w-full max-w-sm border-l sm:max-w-md",
           side === "left" &&
@@ -67,9 +67,9 @@ function SheetContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
           <X className="size-4" />
-          <span className="sr-only">关闭</span>
+          <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </SheetPortal>
