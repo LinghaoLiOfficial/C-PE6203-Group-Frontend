@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --background: #050816;
-  --foreground: #e8eefc;
-  --card: rgba(11, 18, 38, 0.86);
-  --card-foreground: #e8eefc;
-  --popover: #0b1226;
-  --popover-foreground: #e8eefc;
-  --primary: #4f8cff;
-  --primary-foreground: #050816;
-  --secondary: rgba(96, 120, 196, 0.14);
-  --secondary-foreground: #d8e4ff;
-  --muted: rgba(148, 163, 184, 0.12);
-  --muted-foreground: #91a0c5;
-  --accent: rgba(79, 140, 255, 0.18);
-  --accent-foreground: #e8eefc;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #e2e8f0;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #eaf2ff;
+  --accent-foreground: #0f172a;
   --destructive: #ff6b7a;
-  --border: rgba(120, 145, 205, 0.18);
-  --input: rgba(120, 145, 205, 0.22);
-  --ring: #7cb0ff;
+  --border: rgba(15, 23, 42, 0.12);
+  --input: rgba(15, 23, 42, 0.16);
+  --ring: #3b82f6;
+  --page-glow-primary: rgba(37, 99, 235, 0.04);
+  --page-glow-secondary: rgba(14, 165, 233, 0.03);
+  --page-gradient-start: #ffffff;
   --radius: 0.5rem;
 }
 
@@ -41,6 +46,9 @@
   --border: rgba(130, 154, 212, 0.18);
   --input: rgba(130, 154, 212, 0.22);
   --ring: #8ebaff;
+  --page-glow-primary: rgba(78, 134, 255, 0.16);
+  --page-glow-secondary: rgba(42, 208, 255, 0.08);
+  --page-gradient-start: #081023;
 }
 
 @theme inline {
@@ -77,21 +85,25 @@
 
   html {
     scroll-behavior: smooth;
+    color-scheme: light;
+  }
+
+  html.dark {
     color-scheme: dark;
   }
 
   body {
     @apply bg-background text-foreground font-sans;
     background-image:
-      radial-gradient(circle at top, rgba(78, 134, 255, 0.16) 0%, rgba(78, 134, 255, 0) 34%),
-      radial-gradient(circle at 80% 10%, rgba(42, 208, 255, 0.08) 0%, rgba(42, 208, 255, 0) 24%),
-      linear-gradient(180deg, #081023 0%, var(--background) 22rem, var(--background) 100%);
+      radial-gradient(circle at top, var(--page-glow-primary) 0%, rgba(37, 99, 235, 0) 34%),
+      radial-gradient(circle at 80% 10%, var(--page-glow-secondary) 0%, rgba(14, 165, 233, 0) 24%),
+      linear-gradient(180deg, var(--page-gradient-start) 0%, var(--background) 22rem, var(--background) 100%);
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--primary) 70%, black);
+    background: color-mix(in srgb, var(--primary) 82%, white);
     color: white;
   }
 
@@ -101,7 +113,7 @@
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--primary) 72%, black);
+    background: color-mix(in srgb, var(--primary) 82%, white);
     color: white;
   }
 }

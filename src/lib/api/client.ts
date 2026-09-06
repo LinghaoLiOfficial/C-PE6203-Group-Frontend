@@ -17,11 +17,17 @@ async function fetchJson<T>(path: string, init: RequestInit = {}, token?: string
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
-  const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "")}/${path.replace(/^\//, "")}`, {
-    ...init,
-    credentials: "include",
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "")}/${path.replace(/^\//, "")}`, {
+      ...init,
+      credentials: "include",
+      headers,
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : "Network request failed";
+    throw new ApiError(`Unable to reach the API. ${reason}`, 0, error);
+  }
   const text = await response.text();
   const payload = text ? safeParse(text) : null;
   if (!response.ok) {

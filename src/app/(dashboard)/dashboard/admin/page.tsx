@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -67,9 +68,12 @@ function AdminInner() {
         <CardHeader>
           <CardTitle>Admin actions</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-wrap gap-3">
           <Button onClick={handleRun} disabled={running}>
             {running ? "Running..." : "Run ingestion"}
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/job-import">Open CSV import</Link>
           </Button>
         </CardContent>
       </Card>

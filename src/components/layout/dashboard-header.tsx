@@ -20,9 +20,9 @@ export function DashboardHeader() {
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/80 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_24px_60px_rgba(0,0,0,0.28)] backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 shadow-sm dark:border-border/70 dark:bg-card/80 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_24px_60px_rgba(0,0,0,0.28)] dark:backdrop-blur sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <div className="text-sm text-cyan-200/70">Job Portal</div>
+        <div className="text-sm text-muted-foreground dark:text-cyan-200/70">Job Portal</div>
         <div className="text-lg font-semibold tracking-[-0.01em] text-foreground">{user?.profile?.first_name || user?.username || "Dashboard"}</div>
       </div>
       <div className="flex items-center gap-2">

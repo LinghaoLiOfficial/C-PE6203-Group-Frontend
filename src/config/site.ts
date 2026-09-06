@@ -1,11 +1,14 @@
 import { Bell, BriefcaseBusiness, LayoutDashboard, UserRound, FileText, ShieldCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import type { UserRole } from "@/lib/types";
+
 export type NavItem = {
   label: string;
   href: string;
   icon?: LucideIcon;
   description?: string;
+  roles?: UserRole[];
 };
 
 export const siteConfig = {
@@ -25,6 +28,7 @@ export const siteConfig = {
   dashboardNav: [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Overview" },
     { label: "Jobs", href: "/dashboard/jobs", icon: BriefcaseBusiness, description: "Browse jobs" },
+    { label: "Job Import", href: "/dashboard/job-import", icon: ShieldCheck, description: "Upload CSV", roles: ["admin"] },
     { label: "Resumes", href: "/dashboard/resumes", icon: FileText, description: "Upload and parse" },
     { label: "Applications", href: "/dashboard/applications", icon: ShieldCheck, description: "Track status" },
     { label: "Notifications", href: "/dashboard/notifications", icon: Bell, description: "Inbox" },

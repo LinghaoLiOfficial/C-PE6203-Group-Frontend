@@ -20,6 +20,10 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
+## Quick Start
+
+- Frontend: `pnpm dev`
+
 ## Run
 
 - App: `http://localhost:3000`

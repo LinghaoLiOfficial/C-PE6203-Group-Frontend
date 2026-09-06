@@ -1,254 +1,298 @@
 "use client";
 
-import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
-import { ChevronDown, ExternalLink, LoaderCircle, MapPin, Search, WandSparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ExternalLink, LoaderCircle, MapPin, Search, WandSparkles, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { createApplication, getDashboardSummary, listJobs, rewriteJobResume } from "@/lib/api";
-import type { DashboardSummary } from "@/lib/types";
-import type { PaginatedJobsResponse } from "@/lib/types";
+import { createApplication, getJob, listOpportunities, rewriteJobResume, sendFeedback } from "@/lib/api";
+import type { Job, JobDetail, OpportunityMap } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Pagination } from "@/components/ui/pagination";
 
-const LOW_SALARY_THRESHOLD = 74500;
-const MID_SALARY_THRESHOLD = 95500;
-const MIN_LOADING_MS = 1000;
-const DEFAULT_PAGE_SIZE = 10;
+const sectionOrder = ["Easy Wins", "High-Potential", "Stretch"];
 
-function getSalaryTierBackground(job: NonNullable<PaginatedJobsResponse["items"]>[number]) {
-  const annualSalary =
-    job.mid_salary_sgd != null
-      ? job.pay_period?.toLowerCase().startsWith("month")
-        ? job.mid_salary_sgd * 12
-        : job.mid_salary_sgd
-      : null;
-  if (annualSalary == null) {
-    return "bg-sky-500/8";
+function getJobTier(score?: number | null) {
+  const value = score ?? 0;
+  if (value >= 0.7) {
+    return {
+      tone: "border-emerald-500/30 bg-emerald-500/8 hover:border-emerald-500/50",
+    };
   }
-  if (annualSalary < LOW_SALARY_THRESHOLD) {
-    return "bg-blue-500/10";
+  if (value >= 0.4) {
+    return {
+      tone: "border-amber-500/30 bg-amber-500/8 hover:border-amber-500/50",
+    };
   }
-  if (annualSalary < MID_SALARY_THRESHOLD) {
-    return "bg-sky-500/12";
-  }
-  return "bg-cyan-500/12";
+  return {
+    tone: "border-slate-500/30 bg-slate-500/8 hover:border-slate-500/50",
+  };
 }
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<PaginatedJobsResponse | null>(null);
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [searchSummary, setSearchSummary] = useState<PaginatedJobsResponse["summary"] | null>(null);
-  const [expandedJobIds, setExpandedJobIds] = useState<Set<string>>(new Set());
-  const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
-  const [company, setCompany] = useState("");
-  const [loadingJobs, setLoadingJobs] = useState(false);
-
-  const runSearch = async (nextQuery: string, nextLocation: string, nextCompany: string, nextPage = 1) => {
-    setLoadingJobs(true);
-    const startedAt = Date.now();
-    try {
-      const params = new URLSearchParams();
-      params.set("page", String(nextPage));
-      params.set("limit", String(DEFAULT_PAGE_SIZE));
-      if (nextQuery) params.set("skills", nextQuery);
-      if (nextLocation) params.set("location", nextLocation);
-      if (nextCompany) params.set("company", nextCompany);
-      const result = await listJobs(params.toString());
-      const elapsed = Date.now() - startedAt;
-      if (elapsed < MIN_LOADING_MS) {
-        await new Promise((resolve) => window.setTimeout(resolve, MIN_LOADING_MS - elapsed));
-      }
-      setJobs(result);
-      setSearchSummary(result.summary ?? null);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to load jobs");
-    } finally {
-      setLoadingJobs(false);
-    }
-  };
+  const router = useRouter();
+  const [map, setMap] = useState<OpportunityMap | null>(null);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<JobDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [tailoring, setTailoring] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const summaryResult = await getDashboardSummary();
-        setSummary(summaryResult);
-        await runSearch("", "", "", 1);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to load jobs");
-      }
-    })();
+    void listOpportunities()
+      .then(setMap)
+      .catch((error) => toast.error(error instanceof Error ? error.message : "Unable to load opportunities"))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleSearch = async () => {
-    await runSearch(query.trim(), location.trim(), company.trim(), 1);
-  };
+  const sections = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return sectionOrder
+      .map((title) => ({
+        title,
+        jobs: (map?.sections.find((section) => section.title === title)?.jobs ?? []).filter((job) =>
+          !query || `${job.job_title} ${job.company_name} ${job.location}`.toLowerCase().includes(query),
+        ),
+      }))
+      .filter((section) => section.jobs.length);
+  }, [map, search]);
 
-  const handlePageChange = async (nextPage: number) => {
-    await runSearch(query.trim(), location.trim(), company.trim(), nextPage);
-  };
-
-  const toggleJobExpanded = (jobId: string) => {
-    setExpandedJobIds((current) => {
-      const next = new Set(current);
-      if (next.has(jobId)) {
-        next.delete(jobId);
-      } else {
-        next.add(jobId);
-      }
-      return next;
-    });
-  };
-
-  const stopCardToggle = (event: MouseEvent | KeyboardEvent) => {
-    event.stopPropagation();
-  };
-
-  const handleApply = async (jobId: string) => {
-    const applyWindow = window.open("", "_blank", "noreferrer");
+  const openJob = async (job: Job) => {
     try {
-      const result = await createApplication(jobId);
-      toast.success(result.created ? "Application saved" : "Application already exists");
-      if (applyWindow) {
-        applyWindow.location.href = result.apply_url;
-      } else {
-        window.open(result.apply_url, "_blank", "noreferrer");
-      }
+      setSelected(await getJob(job.id));
+      await sendFeedback({ job_id: job.id, event_type: "view" });
     } catch (error) {
-      applyWindow?.close();
-      toast.error(error instanceof Error ? error.message : "Application failed");
+      toast.error(error instanceof Error ? error.message : "Unable to load job details");
     }
   };
 
-  const handleRewrite = async (jobId: string) => {
-    const result = await rewriteJobResume(jobId);
-    toast.success(result.cached ? "Loaded cached rewrite" : "Rewrite created");
+  const apply = async (job: Job) => {
+    const result = await createApplication(job.id);
+    toast.success(result.created ? "Application saved" : "Application already tracked");
+    window.open(result.apply_url, "_blank", "noopener,noreferrer");
+  };
+
+  const tailor = async (job: Job) => {
+    setTailoring(true);
+    try {
+      const result = await rewriteJobResume(job.id);
+      toast.success("Tailored resume generation started");
+      setSelected(null);
+      router.push(`/dashboard/resumes?tailored_task=${result.id}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to start tailored resume generation");
+    } finally {
+      setTailoring(false);
+    }
   };
 
   return (
-    <section className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Browse jobs</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-[1.2fr_1fr_1fr_auto]">
-          <Input placeholder="Skills e.g. React, Python" value={query} onChange={(e) => setQuery(e.target.value)} />
-          <Input placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
-          <Input placeholder="Company" value={company} onChange={(e) => setCompany(e.target.value)} />
-          <Button onClick={handleSearch} className="md:self-start" disabled={loadingJobs}>
-            <Search className="size-4" />
-            Search
-          </Button>
-        </CardContent>
-      </Card>
+    <section className="space-y-6">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div>
+          <p className="text-sm font-medium text-primary">Opportunity map</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Roles worth your attention</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Scores are feature vectors, not a mysterious badge.</p>
+        </div>
+        <div className="relative w-full md:w-72">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input className="pl-9" placeholder="Filter role, company, location" value={search} onChange={(event) => setSearch(event.target.value)} />
+        </div>
+      </div>
 
-      {loadingJobs ? (
+      {loading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <LoaderCircle className="size-4 animate-spin" />
-          Loading jobs...
+          Building your frontier...
         </div>
-      ) : null}
-
-      {!loadingJobs && searchSummary ? (
-        <Card className="w-full border-primary/20 bg-primary/10 px-4 py-2 text-center shadow-none">
-          <div className="text-sm font-medium text-cyan-50">
-            Search results contain {searchSummary.jobs_total} {searchSummary.jobs_total === 1 ? "job" : "jobs"}
-          </div>
-        </Card>
-      ) : null}
-
-      {!loadingJobs ? (
-        <div className="grid gap-4">
-          {jobs?.items.map((job) => (
-            <Card
-              key={job.id}
-              className={`cursor-pointer ${getSalaryTierBackground(job)}`}
-              onClick={() => toggleJobExpanded(job.id)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  toggleJobExpanded(job.id);
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              aria-expanded={expandedJobIds.has(job.id)}
-            >
-              <CardHeader className="flex flex-row items-start justify-between gap-4">
-                <div className="space-y-3">
-                  <CardTitle className="text-base">{job.job_title}</CardTitle>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{job.company_name || "Unknown company"}</Badge>
-                    {job.mid_salary_sgd != null && job.pay_period ? (
-                      <Badge variant="outline">SGD {job.mid_salary_sgd.toFixed(2)} / {job.pay_period}</Badge>
-                    ) : null}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <MapPin className="size-3.5 shrink-0" />
-                    <span>{job.location || "Remote"}</span>
-                  </div>
+      ) : sections.length ? (
+        <div className="grid gap-8">
+          {sections.map((section) => (
+            <section key={section.title} className="space-y-3">
+              <div className="flex items-end justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold">{section.title}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {section.title === "Easy Wins"
+                      ? "Strong evidence overlap and low transition cost."
+                      : section.title === "High-Potential"
+                        ? "Good upside with a manageable gap to close."
+                        : "Deliberate pivots that may compound your options."}
+                  </p>
                 </div>
-                {summary?.active_resume_exists ? (
-                  <Badge variant="secondary">{Math.round((job.match_score || 0) * 100)}%</Badge>
-                ) : null}
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className={`text-sm text-muted-foreground ${expandedJobIds.has(job.id) ? "" : "line-clamp-3"}`}>
-                  {job.job_description}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {job.skill_tags?.map((tag) => (
-                    <Badge key={tag} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    onClick={(event) => {
-                      stopCardToggle(event);
-                      void handleApply(job.id);
-                    }}
+                <Badge variant="outline">{section.jobs.length} roles</Badge>
+              </div>
+              <div className="grid gap-3 lg:grid-cols-2">
+                {section.jobs.map((job) => (
+                  <Card
+                    key={job.id}
+                    className={[
+                      "cursor-pointer transition-colors",
+                      getJobTier(job.opportunity_score).tone,
+                    ].join(" ")}
+                    onClick={() => void openJob(job)}
                   >
-                    Apply
-                    <ExternalLink className="size-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={(event) => {
-                      stopCardToggle(event);
-                      void handleRewrite(job.id);
-                    }}
-                  >
-                    <WandSparkles className="size-4" />
-                    Tailor resume
-                  </Button>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    onClick={stopCardToggle}
-                    onKeyDown={stopCardToggle}
-                  >
-                    <a href={job.external_apply_url} target="_blank" rel="noreferrer">
-                      Open external link
-                    </a>
-                  </Button>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <ChevronDown className={`size-3.5 transition-transform ${expandedJobIds.has(job.id) ? "rotate-180" : ""}`} />
-                  <span>{expandedJobIds.has(job.id) ? "Click to collapse description" : "Click card to expand description"}</span>
-                </div>
-              </CardContent>
-            </Card>
+                    <CardContent className="space-y-4 p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="font-semibold">{job.job_title}</h3>
+                          <p className="mt-1 text-sm text-muted-foreground">{job.company_name || "Unknown company"}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-semibold text-primary">
+                            {Math.round((job.opportunity_score ?? 0) * 100)}%
+                          </p>
+                          <p className="text-xs text-muted-foreground">opportunity fit</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="size-3.5" />
+                          {job.location || "Flexible location"}
+                        </span>
+                        <span>{job.transition_difficulty || "moderate"} transition</span>
+                        <span>{Math.round((job.data_confidence ?? 0) * 100)}% confidence</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(job.rationale ?? []).slice(0, 2).map((item) => (
+                          <Badge key={item} variant="secondary">
+                            {item}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
-      ) : null}
+      ) : (
+        <Card>
+          <CardContent className="py-16 text-center text-sm text-muted-foreground">
+            No ranked opportunities yet. Upload and confirm a resume first.
+          </CardContent>
+        </Card>
+      )}
 
-      {!loadingJobs && jobs?.pagination ? (
-        <Pagination page={jobs.pagination.page} totalPages={jobs.pagination.total_pages} onPageChange={handlePageChange} />
+      {selected ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-background/80 p-4 backdrop-blur-sm"
+          onClick={() => setSelected(null)}
+        >
+          <Card className="flex w-[min(96vw,1280px)] max-h-[86vh] flex-col overflow-hidden" onClick={(event) => event.stopPropagation()}>
+            <CardHeader className="relative flex flex-row items-start justify-between gap-4 pb-4">
+              <div>
+                <CardTitle>{selected.job_title}</CardTitle>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {selected.company_name || "Unknown company"} · {selected.location || "Flexible location"}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Button className="w-44" onClick={() => void apply(selected)}>
+                    <ExternalLink className="size-4" />
+                    Track and apply
+                  </Button>
+                  <Button className="w-44" variant="outline" disabled={tailoring} onClick={() => void tailor(selected)}>
+                    <WandSparkles className="size-4" />
+                    {tailoring ? "Starting..." : "Plan tailored resume"}
+                  </Button>
+                </div>
+              </div>
+              <div className="pr-10">
+                <Badge>{Math.round((selected.opportunity_score ?? 0) * 100)}% fit</Badge>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 top-4"
+                onClick={() => setSelected(null)}
+                aria-label="Close details"
+              >
+                <X className="size-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="flex-1 space-y-6 overflow-y-auto">
+              <div className="grid gap-4 sm:grid-cols-3">
+                {Object.entries(selected.fit_breakdown ?? {}).map(([key, value]) => (
+                  <div key={key} className="rounded-lg border border-border/70 bg-muted/30 p-3 shadow-sm">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{key.replaceAll("_", " ")}</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">{Math.round(Number(value) * 100)}%</p>
+                  </div>
+                ))}
+              </div>
+              <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
+                <div className="rounded-lg border border-border/70 bg-muted/20 p-4 shadow-sm">
+                  <h3 className="text-sm font-semibold text-foreground">Opportunity context</h3>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-md border border-border/60 bg-background/80 p-3">
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Transition cost</div>
+                      <div className="mt-1 text-sm font-medium text-foreground">
+                        {selected.opportunity_explanation?.transition_cost ?? "moderate"}
+                      </div>
+                    </div>
+                    <div className="rounded-md border border-border/60 bg-background/80 p-3">
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Confidence</div>
+                      <div className="mt-1 text-sm font-medium text-foreground">
+                        {Math.round((selected.opportunity_explanation?.confidence ?? 0) * 100)}%
+                      </div>
+                    </div>
+                    <div className="rounded-md border border-border/60 bg-background/80 p-3">
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Salary</div>
+                      <div className="mt-1 text-sm font-medium text-foreground">
+                        ${selected.opportunity_explanation?.salary_context?.annual_salary_sgd ?? "n/a"} SGD
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid gap-3">
+                    {[
+                      ["What fits", selected.opportunity_explanation?.what_fits],
+                      ["What transfers", selected.opportunity_explanation?.what_transfers],
+                      ["What is missing", selected.opportunity_explanation?.what_is_missing],
+                    ].map(([title, items]) => (
+                      <div key={String(title)} className="rounded-md border border-border/60 bg-background/80 p-3">
+                        <h4 className="text-xs uppercase tracking-wide text-muted-foreground">{title}</h4>
+                        <ul className="mt-2 space-y-1.5 text-sm text-foreground">
+                          {(items as string[] | undefined)?.map((item) => (
+                            <li key={item} className="rounded-md bg-muted/40 px-2 py-1 leading-5">
+                              {item}
+                            </li>
+                          )) ?? <li className="text-muted-foreground">No additional signal</li>}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="rounded-lg border border-border/70 bg-muted/20 p-4 shadow-sm">
+                    <h3 className="text-sm font-semibold text-foreground">Canonical job profile</h3>
+                    <div className="mt-3 grid gap-2 rounded-md border border-border/60 bg-background/80 p-3 text-sm text-muted-foreground md:grid-cols-2">
+                      <div>Occupation: {selected.canonical_job_profile?.occupation_family ?? "General"}</div>
+                      <div>Seniority: {selected.canonical_job_profile?.seniority ?? "mid"}</div>
+                      <div>
+                        Required skills: {(selected.canonical_job_profile?.required_skills ?? []).join(", ") || "None"}
+                      </div>
+                      <div>
+                        Preferred skills: {(selected.canonical_job_profile?.preferred_skills ?? []).join(", ") || "None"}
+                      </div>
+                      <div>
+                        Education: {(selected.canonical_job_profile?.education_requirements ?? []).join(", ") || "None"}
+                      </div>
+                      <div>
+                        Experience: {(selected.canonical_job_profile?.experience_requirements ?? []).join(", ") || "None"}
+                      </div>
+                      <div className="md:col-span-2">
+                        Salary confidence: {selected.canonical_job_profile?.salary_confidence ?? "C"} · Trust:{" "}
+                        {Math.round((selected.canonical_job_profile?.trust_score ?? 0) * 100)}% · Freshness:{" "}
+                        {Math.round((selected.canonical_job_profile?.freshness_score ?? 0) * 100)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       ) : null}
     </section>
   );
