@@ -43,7 +43,6 @@ export default function JobsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
     void listOpportunities()
       .then((next) => {
         if (active) setMap(next);
