@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { createApplication, getJob, listOpportunities, rewriteJobResume, sendFeedback } from "@/lib/api";
 import type { Job, JobDetail, OpportunityMap } from "@/lib/types";
+import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,13 +39,24 @@ export default function JobsPage() {
   const [selected, setSelected] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [tailoring, setTailoring] = useState(false);
+  const resumeRevision = useAppStore((state) => state.resumeRevision);
 
   useEffect(() => {
+    let active = true;
     void listOpportunities()
-      .then(setMap)
-      .catch((error) => toast.error(error instanceof Error ? error.message : "Unable to load opportunities"))
-      .finally(() => setLoading(false));
-  }, []);
+      .then((next) => {
+        if (active) setMap(next);
+      })
+      .catch((error) => {
+        if (active) toast.error(error instanceof Error ? error.message : "Unable to load opportunities");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [resumeRevision]);
 
   const sections = useMemo(() => {
     const query = search.trim().toLowerCase();

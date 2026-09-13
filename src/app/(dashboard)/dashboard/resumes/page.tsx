@@ -21,6 +21,7 @@ import {
   uploadResume,
 } from "@/lib/api";
 import type { Resume, ResumeGraph, ResumeParseTask, ResumeTailoringTask, ResumeVariantListItem } from "@/lib/types";
+import { useAppStore } from "@/store/app-store";
 
 const POLL_INTERVAL_MS = 1000;
 const FEATURE_CARD_CLASS = "max-h-72 overflow-y-auto rounded-md border border-border/70 bg-background/60 p-4";
@@ -85,6 +86,7 @@ export default function ResumesPage() {
   const [showRationale, setShowRationale] = useState<Record<string, boolean>>({});
   const searchParams = useSearchParams();
   const taskId = searchParams.get("tailored_task");
+  const bumpResumeRevision = useAppStore((state) => state.bumpResumeRevision);
 
   const activeResume = useMemo(() => resumes.find((resume) => resume.is_active) ?? resumes[0] ?? null, [resumes]);
   const pollingResumeId = useMemo(
@@ -134,11 +136,12 @@ export default function ResumesPage() {
       );
       if (task.status === "completed") {
         await refreshResumes(resumeId);
+        bumpResumeRevision();
       } else if (task.status === "failed") {
         await refreshResumes(resumeId);
       }
     }
-  }, [refreshResumes]);
+  }, [refreshResumes, bumpResumeRevision]);
 
   useEffect(() => {
     if (!pollingResumeId) return undefined;
@@ -247,6 +250,7 @@ export default function ResumesPage() {
       const result = await uploadResume(file);
       toast.success("File uploaded. Parse it when ready.");
       await refreshResumes(result.resume_id);
+      bumpResumeRevision();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Upload failed");
     } finally {
