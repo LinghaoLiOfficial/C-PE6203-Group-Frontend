@@ -180,6 +180,12 @@ export default function JobsPage() {
             </section>
           ))}
         </div>
+      ) : map?.sections.length ? (
+        <Card>
+          <CardContent className="py-16 text-center text-sm text-muted-foreground">
+            No roles match your search. Try a different keyword.
+          </CardContent>
+        </Card>
       ) : (
         <Card>
           <CardContent className="py-16 text-center text-sm text-muted-foreground">

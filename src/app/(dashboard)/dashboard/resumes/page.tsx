@@ -323,8 +323,7 @@ export default function ResumesPage() {
           </div>
           <div className="flex flex-wrap justify-end gap-2">
             <Badge>Latest</Badge>
-            {variant.cached ? <Badge variant="secondary">Cached</Badge> : null}
-            <Badge variant="outline">{new Date(variant.created_at).toLocaleDateString()}</Badge>
+            <Badge variant="outline">Generated {new Date(variant.created_at).toLocaleDateString()}</Badge>
           </div>
         </div>
       </CardHeader>
